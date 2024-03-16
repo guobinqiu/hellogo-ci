@@ -27,10 +27,10 @@ pipeline {
                 ]) {
                     sh """
                     docker build -t qiuguobin/hellogo -f Dockerfile .
-                    docker tag qiuguobin/hellogo qiuguobin/hellojava-${GIT_COMMIT}
+                    docker tag qiuguobin/hellogo qiuguobin/hellogo:${GIT_COMMIT}
                     echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
                     docker push qiuguobin/hellogo
-                    docker push qiuguobin/hellogo-${GIT_COMMIT}
+                    docker push qiuguobin/hellogo:${GIT_COMMIT}
                     """
                 }
             }
