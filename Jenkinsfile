@@ -26,9 +26,11 @@ pipeline {
                     usernamePassword(credentialsId: '75d62f1f-d4a5-4033-b0b9-eb05ffb862be', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')
                 ]) {
                     sh """
+                    docker build -t qiuguobin/hellogo -f Dockerfile .
+                    docker tag qiuguobin/hellogo qiuguobin/hellojava-${GIT_COMMIT}
                     echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-                    docker build -t qiuguobin/hellogo:${GIT_COMMIT} -f Dockerfile .
-                    docker push qiuguobin/hellogo:${GIT_COMMIT}
+                    docker push qiuguobin/hellogo
+                    docker push qiuguobin/hellogo-${GIT_COMMIT}
                     """
                 }
             }
@@ -81,10 +83,11 @@ pipeline {
                     //这里定义latest_version为groovy变量, 是jenkins推荐做法
                     //双引号sh块内的变量会被jenkins当作groovy变量
                     //当latest_version在双引号sh块内时, 通过${latest_version}读取groovy变量值
+                    def latest_version
                     withCredentials([usernamePassword(credentialsId: 'd04c26e0-50f5-4b05-adeb-fdc09e6f77de', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                         script {
                             //一定要trim
-                            def latest_version = sh(script: "ls ../hellogo-ci/db/migrations/ | cut -d '_' -f1 | sort -rn | head -n 1", returnStdout: true).trim()
+                            latest_version = sh(script: "ls ../hellogo-ci/db/migrations/ | cut -d '_' -f1 | sort -rn | head -n 1", returnStdout: true).trim()
                             echo "${latest_version}"
                         }
                         sh """
